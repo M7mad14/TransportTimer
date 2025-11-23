@@ -16,15 +16,32 @@ export default function TimerScreen() {
   const { theme } = useTheme();
   const navigation = useNavigation();
 
-  useEffect(() => {
-    I18nManager.forceRTL(true);
-    I18nManager.allowRTL(true);
-  }, []);
   const [tripStarted, setTripStarted] = useState(false);
   const [tripStartTime, setTripStartTime] = useState<Date | null>(null);
   const [events, setEvents] = useState<TripEvent[]>([]);
   const [customEventText, setCustomEventText] = useState("");
   const [summary, setSummary] = useState("");
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
+  useEffect(() => {
+    I18nManager.forceRTL(true);
+    I18nManager.allowRTL(true);
+  }, []);
+
+  useEffect(() => {
+    if (!tripStarted || !tripStartTime) {
+      setElapsedSeconds(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      const diffInSeconds = Math.floor((now.getTime() - tripStartTime.getTime()) / 1000);
+      setElapsedSeconds(diffInSeconds);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [tripStarted, tripStartTime]);
 
   const formatTime = (date: Date): string => {
     const hours = date.getHours().toString().padStart(2, "0");
@@ -46,6 +63,13 @@ export default function TimerScreen() {
     } else {
       return `${mins} د و ${secs} ث`;
     }
+  };
+
+  const formatElapsedTime = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   const generateSummary = (eventList: TripEvent[]): string => {
@@ -215,6 +239,12 @@ export default function TimerScreen() {
     <ScreenScrollView>
       <View style={styles.container}>
         <ThemedView style={styles.card}>
+          {tripStarted && (
+            <View style={styles.timerDisplay}>
+              <ThemedText style={styles.timerLabel}>الوقت المنقضي</ThemedText>
+              <ThemedText style={styles.timerValue}>{formatElapsedTime(elapsedSeconds)}</ThemedText>
+            </View>
+          )}
           <View style={styles.buttonGrid}>
             <Pressable
               style={({ pressed }) => [
@@ -569,6 +599,22 @@ const styles = StyleSheet.create({
   summaryText: {
     fontSize: 14,
     textAlign: "right",
+  },
+  timerDisplay: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: Spacing["2xl"],
+    paddingVertical: Spacing.lg,
+    borderRadius: BorderRadius.xs,
+  },
+  timerLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginBottom: Spacing.sm,
+  },
+  timerValue: {
+    fontSize: 48,
+    fontWeight: "700",
   },
   footer: {
     fontSize: 12,
