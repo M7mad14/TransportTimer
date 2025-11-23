@@ -23,6 +23,7 @@ export default function TimerScreen() {
   const [customEventText, setCustomEventText] = useState("");
   const [summary, setSummary] = useState("");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [showEventDropdown, setShowEventDropdown] = useState(false);
 
   useEffect(() => {
     I18nManager.forceRTL(true);
@@ -303,73 +304,16 @@ export default function TimerScreen() {
               ]}
               onPress={() => {
                 playClickSound();
-                addEvent("خروج من المنزل");
+                setShowEventDropdown(!showEventDropdown);
               }}
               disabled={!tripStarted}
             >
-              <ThemedText style={[styles.buttonText, { color: theme.text }]}>
-                خروج من المنزل
-              </ThemedText>
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.button,
-                styles.secondaryButton,
-                {
-                  backgroundColor: theme.backgroundTertiary,
-                  opacity: pressed ? 0.7 : tripStarted ? 1 : 0.5,
-                },
-              ]}
-              onPress={() => {
-                playClickSound();
-                addEvent("ركوب السيارة");
-              }}
-              disabled={!tripStarted}
-            >
-              <ThemedText style={[styles.buttonText, { color: theme.text }]}>
-                ركوب السيارة
-              </ThemedText>
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.button,
-                styles.secondaryButton,
-                {
-                  backgroundColor: theme.backgroundTertiary,
-                  opacity: pressed ? 0.7 : tripStarted ? 1 : 0.5,
-                },
-              ]}
-              onPress={() => {
-                playClickSound();
-                addEvent("ركوب المترو");
-              }}
-              disabled={!tripStarted}
-            >
-              <ThemedText style={[styles.buttonText, { color: theme.text }]}>
-                ركوب المترو
-              </ThemedText>
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.button,
-                styles.secondaryButton,
-                {
-                  backgroundColor: theme.backgroundTertiary,
-                  opacity: pressed ? 0.7 : tripStarted ? 1 : 0.5,
-                },
-              ]}
-              onPress={() => {
-                playClickSound();
-                addEvent("الوصول للوجهة");
-              }}
-              disabled={!tripStarted}
-            >
-              <ThemedText style={[styles.buttonText, { color: theme.text }]}>
-                الوصول للوجهة
-              </ThemedText>
+              <View style={styles.buttonContent}>
+                <Feather name={showEventDropdown ? "chevron-up" : "chevron-down"} size={18} color={theme.text} />
+                <ThemedText style={[styles.buttonText, { color: theme.text, marginRight: Spacing.sm }]}>
+                  أحداث الرحلة
+                </ThemedText>
+              </View>
             </Pressable>
 
             <Pressable
@@ -386,6 +330,62 @@ export default function TimerScreen() {
               <ThemedText style={styles.buttonText}>إعادة تعيين</ThemedText>
             </Pressable>
           </View>
+
+          {showEventDropdown && tripStarted && (
+            <View style={[styles.dropdownMenu, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.dropdownItem,
+                  { opacity: pressed ? 0.6 : 1 },
+                ]}
+                onPress={() => {
+                  playClickSound();
+                  addEvent("خروج من المنزل");
+                }}
+              >
+                <ThemedText style={styles.dropdownItemText}>خروج من المنزل</ThemedText>
+              </Pressable>
+
+              <Pressable
+                style={({ pressed }) => [
+                  styles.dropdownItem,
+                  { opacity: pressed ? 0.6 : 1 },
+                ]}
+                onPress={() => {
+                  playClickSound();
+                  addEvent("ركوب السيارة");
+                }}
+              >
+                <ThemedText style={styles.dropdownItemText}>ركوب السيارة</ThemedText>
+              </Pressable>
+
+              <Pressable
+                style={({ pressed }) => [
+                  styles.dropdownItem,
+                  { opacity: pressed ? 0.6 : 1 },
+                ]}
+                onPress={() => {
+                  playClickSound();
+                  addEvent("ركوب المترو");
+                }}
+              >
+                <ThemedText style={styles.dropdownItemText}>ركوب المترو</ThemedText>
+              </Pressable>
+
+              <Pressable
+                style={({ pressed }) => [
+                  styles.dropdownItem,
+                  { borderBottomWidth: 0, opacity: pressed ? 0.6 : 1 },
+                ]}
+                onPress={() => {
+                  playClickSound();
+                  addEvent("الوصول للوجهة");
+                }}
+              >
+                <ThemedText style={styles.dropdownItemText}>الوصول للوجهة</ThemedText>
+              </Pressable>
+            </View>
+          )}
 
           <View style={styles.customEventSection}>
             <TextInput
@@ -687,5 +687,26 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
     marginTop: Spacing.md,
+  },
+  dropdownMenu: {
+    borderWidth: 1.5,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing["2xl"],
+    overflow: "hidden",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  dropdownItem: {
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderBottomWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dropdownItemText: {
+    fontSize: 14,
+    fontWeight: "500",
   },
 });
