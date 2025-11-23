@@ -361,22 +361,22 @@ export default function TripDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
   },
   card: {
-    padding: Spacing.xl,
-    borderRadius: BorderRadius.lg,
-    shadowOffset: { width: 0, height: 4 },
+    padding: Spacing['2xl'],
+    borderRadius: BorderRadius.xl,
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.1)',
+    shadowRadius: 20,
+    elevation: 4,
+    borderWidth: 0,
   },
   actionButtons: {
     flexDirection: "row",
-    gap: Spacing.md,
-    marginBottom: Spacing["2xl"],
+    gap: Spacing.lg,
+    marginBottom: Spacing["3xl"],
   },
   actionButton: {
     flex: 1,

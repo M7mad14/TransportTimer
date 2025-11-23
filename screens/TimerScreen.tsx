@@ -314,220 +314,234 @@ export default function TimerScreen() {
   return (
     <ScreenScrollView>
       <View style={styles.container}>
-        <ThemedView style={styles.card}>
-          {tripStarted && (
-            <View style={styles.timerSection}>
-              <View style={styles.timerDisplay}>
-                <ThemedText style={styles.timerLabel}>الوقت المنقضي</ThemedText>
-                <ThemedText style={styles.timerValue}>{formatElapsedTime(elapsedSeconds)}</ThemedText>
-              </View>
-              
-              <View style={styles.locationContainer}>
-                <TextInput
-                  style={[
-                    styles.locationInput,
-                    {
-                      backgroundColor: theme.backgroundSecondary,
-                      borderColor: theme.border,
-                      color: theme.text,
-                      flex: 1,
-                    },
-                  ]}
-                  placeholder="من أين تبدأ؟"
-                  placeholderTextColor={theme.textSecondary}
-                  value={startLocation}
-                  onChangeText={(text) => {
-                    setStartLocation(text);
-                    setSummary(generateSummary(events));
-                  }}
-                  textAlign="right"
-                />
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.locationIconButton,
-                    { backgroundColor: theme.accent, opacity: pressed ? 0.7 : 1 },
-                  ]}
-                  onPress={() => {
-                    playClickSound();
-                    getCurrentLocation();
-                  }}
-                  hitSlop={8}
-                >
-                  <Feather name="navigation" size={18} color="#fff" />
-                </Pressable>
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.locationIconButton,
-                    { backgroundColor: theme.accent, opacity: pressed ? 0.7 : 1, marginRight: Spacing.xs },
-                  ]}
-                  onPress={() => {
-                    playClickSound();
-                    openMapsForLocation();
-                  }}
-                  hitSlop={8}
-                >
-                  <Feather name="map-pin" size={18} color="#fff" />
-                </Pressable>
-              </View>
-            </View>
-          )}
-          <View style={styles.buttonGrid}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.button,
-                styles.primaryButton,
-                { backgroundColor: theme.accent, opacity: pressed ? 0.7 : 1 },
-              ]}
-              onPress={() => {
-                playClickSound();
-                startTrip();
-              }}
-            >
-              <ThemedText style={styles.buttonText}>بدء الرحلة</ThemedText>
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.button,
-                styles.secondaryButton,
-                {
-                  backgroundColor: theme.backgroundTertiary,
-                  opacity: pressed ? 0.7 : 1,
-                },
-              ]}
-              onPress={() => {
-                playClickSound();
-                navigation.navigate("History" as never);
-              }}
-            >
-              <View style={styles.buttonContent}>
-                <Feather name="clock" size={20} color={theme.text} />
-                <ThemedText style={[styles.buttonText, { color: theme.text, marginRight: Spacing.sm }]}>
-                  الرحلات السابقة
-                </ThemedText>
-              </View>
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.button,
-                styles.secondaryButton,
-                {
-                  backgroundColor: theme.backgroundTertiary,
-                  opacity: pressed ? 0.7 : 1,
-                },
-              ]}
-              onPress={() => {
-                playClickSound();
-                navigation.navigate("Settings" as never);
-              }}
-            >
-              <View style={styles.buttonContent}>
-                <Feather name="settings" size={20} color={theme.text} />
-                <ThemedText style={[styles.buttonText, { color: theme.text, marginRight: Spacing.sm }]}>
-                  الإعدادات
-                </ThemedText>
-              </View>
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.button,
-                styles.secondaryButton,
-                {
-                  backgroundColor: theme.backgroundTertiary,
-                  opacity: pressed ? 0.7 : tripStarted ? 1 : 0.5,
-                },
-              ]}
-              onPress={() => {
-                playClickSound();
-                setShowEventDropdown(!showEventDropdown);
-              }}
-              disabled={!tripStarted}
-            >
-              <View style={styles.buttonContent}>
-                <Feather name={showEventDropdown ? "chevron-up" : "chevron-down"} size={18} color={theme.text} />
-                <ThemedText style={[styles.buttonText, { color: theme.text, marginRight: Spacing.sm }]}>
-                  أحداث الرحلة
-                </ThemedText>
-              </View>
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.button,
-                styles.destructiveButton,
-                { backgroundColor: theme.destructive, opacity: pressed ? 0.7 : 1 },
-              ]}
-              onPress={() => {
-                playClickSound();
-                resetTrip();
-              }}
-            >
-              <ThemedText style={styles.buttonText}>إعادة تعيين</ThemedText>
-            </Pressable>
-          </View>
-
-          {showEventDropdown && tripStarted && (
-            <View style={[styles.dropdownMenu, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
+        {/* Timer Display Card - Only shown when trip started */}
+        {tripStarted && (
+          <ThemedView style={[styles.timerCard, { backgroundColor: theme.accent }]}>
+            <ThemedText style={styles.timerLabel}>الوقت المنقضي</ThemedText>
+            <ThemedText style={styles.timerValue}>{formatElapsedTime(elapsedSeconds)}</ThemedText>
+            
+            {/* Location Input */}
+            <View style={styles.locationContainer}>
+              <TextInput
+                style={[
+                  styles.locationInput,
+                  {
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                    color: '#FFFFFF',
+                    flex: 1,
+                  },
+                ]}
+                placeholder="من أين تبدأ؟"
+                placeholderTextColor="rgba(255, 255, 255, 0.7)"
+                value={startLocation}
+                onChangeText={(text) => {
+                  setStartLocation(text);
+                  setSummary(generateSummary(events));
+                }}
+                textAlign="right"
+              />
               <Pressable
                 style={({ pressed }) => [
-                  styles.dropdownItem,
-                  { opacity: pressed ? 0.6 : 1 },
+                  styles.locationIconButton,
+                  { backgroundColor: 'rgba(255, 255, 255, 0.25)', opacity: pressed ? 0.7 : 1 },
+                ]}
+                onPress={() => {
+                  playClickSound();
+                  getCurrentLocation();
+                }}
+                hitSlop={8}
+              >
+                <Feather name="navigation" size={18} color="#fff" />
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.locationIconButton,
+                  { backgroundColor: 'rgba(255, 255, 255, 0.25)', opacity: pressed ? 0.7 : 1, marginRight: Spacing.xs },
+                ]}
+                onPress={() => {
+                  playClickSound();
+                  openMapsForLocation();
+                }}
+                hitSlop={8}
+              >
+                <Feather name="map-pin" size={18} color="#fff" />
+              </Pressable>
+            </View>
+          </ThemedView>
+        )}
+
+        {/* Main Action Button */}
+        <ThemedView style={styles.actionCard}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.startButton,
+              { backgroundColor: theme.accent, opacity: pressed ? 0.95 : 1 },
+            ]}
+            onPress={() => {
+              playClickSound();
+              startTrip();
+            }}
+          >
+            <View style={styles.startButtonContent}>
+              <View style={styles.startIconCircle}>
+                <Feather name="play" size={32} color="#FFFFFF" />
+              </View>
+              <View style={styles.startTextContainer}>
+                <ThemedText style={styles.startButtonTitle}>بدء رحلة جديدة</ThemedText>
+                <ThemedText style={styles.startButtonSubtitle}>اضغط لبدء تتبع الوقت</ThemedText>
+              </View>
+            </View>
+          </Pressable>
+        </ThemedView>
+
+        {/* Quick Actions Grid */}
+        <View style={styles.quickActionsGrid}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.quickActionCard,
+              { backgroundColor: theme.backgroundDefault, opacity: pressed ? 0.7 : 1 },
+            ]}
+            onPress={() => {
+              playClickSound();
+              navigation.navigate("History" as never);
+            }}
+          >
+            <View style={[styles.quickActionIcon, { backgroundColor: theme.accent + '15' }]}>
+              <Feather name="clock" size={24} color={theme.accent} />
+            </View>
+            <ThemedText style={styles.quickActionText}>الرحلات</ThemedText>
+          </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.quickActionCard,
+              { backgroundColor: theme.backgroundDefault, opacity: pressed ? 0.7 : tripStarted ? 1 : 0.5 },
+            ]}
+            onPress={() => {
+              playClickSound();
+              setShowEventDropdown(!showEventDropdown);
+            }}
+            disabled={!tripStarted}
+          >
+            <View style={[styles.quickActionIcon, { backgroundColor: theme.accentSecondary + '15' }]}>
+              <Feather name="map" size={24} color={theme.accentSecondary} />
+            </View>
+            <ThemedText style={styles.quickActionText}>الأحداث</ThemedText>
+          </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.quickActionCard,
+              { backgroundColor: theme.backgroundDefault, opacity: pressed ? 0.7 : 1 },
+            ]}
+            onPress={() => {
+              playClickSound();
+              navigation.navigate("Settings" as never);
+            }}
+          >
+            <View style={[styles.quickActionIcon, { backgroundColor: theme.success + '15' }]}>
+              <Feather name="settings" size={24} color={theme.success} />
+            </View>
+            <ThemedText style={styles.quickActionText}>الإعدادات</ThemedText>
+          </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.quickActionCard,
+              { backgroundColor: theme.backgroundDefault, opacity: pressed ? 0.7 : 1 },
+            ]}
+            onPress={() => {
+              playClickSound();
+              resetTrip();
+            }}
+          >
+            <View style={[styles.quickActionIcon, { backgroundColor: theme.destructive + '15' }]}>
+              <Feather name="refresh-cw" size={24} color={theme.destructive} />
+            </View>
+            <ThemedText style={styles.quickActionText}>إعادة تعيين</ThemedText>
+          </Pressable>
+        </View>
+
+        {/* Event Shortcuts - Grid Layout */}
+        {showEventDropdown && tripStarted && (
+          <ThemedView style={styles.eventsCard}>
+            <ThemedText style={styles.eventsCardTitle}>أحداث سريعة</ThemedText>
+            <View style={styles.eventsGrid}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.eventButton,
+                  { backgroundColor: theme.backgroundSecondary, opacity: pressed ? 0.7 : 1 },
                 ]}
                 onPress={() => {
                   playClickSound();
                   addEvent("خروج من المنزل");
+                  setShowEventDropdown(false);
                 }}
               >
-                <ThemedText style={styles.dropdownItemText}>خروج من المنزل</ThemedText>
+                <Feather name="home" size={20} color={theme.accent} />
+                <ThemedText style={styles.eventButtonText}>خروج من المنزل</ThemedText>
               </Pressable>
 
               <Pressable
                 style={({ pressed }) => [
-                  styles.dropdownItem,
-                  { opacity: pressed ? 0.6 : 1 },
+                  styles.eventButton,
+                  { backgroundColor: theme.backgroundSecondary, opacity: pressed ? 0.7 : 1 },
                 ]}
                 onPress={() => {
                   playClickSound();
                   addEvent("ركوب السيارة");
+                  setShowEventDropdown(false);
                 }}
               >
-                <ThemedText style={styles.dropdownItemText}>ركوب السيارة</ThemedText>
+                <Feather name="truck" size={20} color={theme.accent} />
+                <ThemedText style={styles.eventButtonText}>ركوب السيارة</ThemedText>
               </Pressable>
 
               <Pressable
                 style={({ pressed }) => [
-                  styles.dropdownItem,
-                  { opacity: pressed ? 0.6 : 1 },
+                  styles.eventButton,
+                  { backgroundColor: theme.backgroundSecondary, opacity: pressed ? 0.7 : 1 },
                 ]}
                 onPress={() => {
                   playClickSound();
                   addEvent("ركوب المترو");
+                  setShowEventDropdown(false);
                 }}
               >
-                <ThemedText style={styles.dropdownItemText}>ركوب المترو</ThemedText>
+                <Feather name="navigation" size={20} color={theme.accent} />
+                <ThemedText style={styles.eventButtonText}>ركوب المترو</ThemedText>
               </Pressable>
 
               <Pressable
                 style={({ pressed }) => [
-                  styles.dropdownItem,
-                  { borderBottomWidth: 0, opacity: pressed ? 0.6 : 1 },
+                  styles.eventButton,
+                  { backgroundColor: theme.backgroundSecondary, opacity: pressed ? 0.7 : 1 },
                 ]}
                 onPress={() => {
                   playClickSound();
                   addEvent("الوصول للوجهة");
+                  setShowEventDropdown(false);
                 }}
               >
-                <ThemedText style={styles.dropdownItemText}>الوصول للوجهة</ThemedText>
+                <Feather name="map-pin" size={20} color={theme.success} />
+                <ThemedText style={styles.eventButtonText}>الوصول للوجهة</ThemedText>
               </Pressable>
             </View>
-          )}
+          </ThemedView>
+        )}
 
-          <View style={styles.customEventSection}>
+        {/* Custom Event Section */}
+        {tripStarted && (
+          <ThemedView style={styles.customEventCard}>
+            <View style={styles.customEventHeader}>
+              <Feather name="edit-3" size={20} color={theme.accent} />
+              <ThemedText style={styles.customEventTitle}>إضافة حدث مخصص</ThemedText>
+            </View>
+            
             <TextInput
               style={[
-                styles.input,
+                styles.customEventInput,
                 {
                   backgroundColor: theme.backgroundSecondary,
                   borderColor: theme.border,
@@ -538,52 +552,51 @@ export default function TimerScreen() {
               placeholderTextColor={theme.textSecondary}
               value={customEventText}
               onChangeText={setCustomEventText}
-              editable={tripStarted}
               textAlign="right"
             />
-            <Pressable
-              style={({ pressed }) => [
-                styles.smallButton,
-                {
-                  backgroundColor: theme.backgroundTertiary,
-                  opacity: pressed ? 0.7 : tripStarted ? 1 : 0.5,
-                },
-              ]}
-              onPress={() => {
-                playClickSound();
-                handleCustomEvent();
-              }}
-              disabled={!tripStarted}
-            >
-              <ThemedText style={[styles.smallButtonText, { color: theme.text }]}>
-                إضافة حدث مخصص
-              </ThemedText>
-            </Pressable>
+            
+            <View style={styles.customEventActions}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.customEventButton,
+                  {
+                    backgroundColor: theme.accent,
+                    opacity: pressed ? 0.7 : 1,
+                    flex: 1,
+                  },
+                ]}
+                onPress={() => {
+                  playClickSound();
+                  handleCustomEvent();
+                }}
+              >
+                <Feather name="plus" size={18} color="#FFFFFF" />
+                <ThemedText style={styles.customEventButtonText}>إضافة</ThemedText>
+              </Pressable>
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.smallButton,
-                {
-                  backgroundColor: theme.backgroundTertiary,
-                  opacity: pressed ? 0.7 : events.length > 0 ? 1 : 0.5,
-                },
-              ]}
-              onPress={() => {
-                playClickSound();
-                attachPhotoToLastEvent();
-              }}
-              disabled={events.length === 0}
-            >
-              <View style={styles.buttonContent}>
-                <Feather name="camera" size={16} color={theme.text} />
-                <ThemedText style={[styles.smallButtonText, { color: theme.text, marginRight: Spacing.sm }]}>
-                  إرفاق صورة
-                </ThemedText>
-              </View>
-            </Pressable>
-          </View>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.customEventButton,
+                  {
+                    backgroundColor: theme.backgroundSecondary,
+                    opacity: pressed ? 0.7 : events.length > 0 ? 1 : 0.5,
+                  },
+                ]}
+                onPress={() => {
+                  playClickSound();
+                  attachPhotoToLastEvent();
+                }}
+                disabled={events.length === 0}
+              >
+                <Feather name="camera" size={18} color={theme.text} />
+              </Pressable>
+            </View>
+          </ThemedView>
+        )}
 
-          {events.length > 0 && (
+        {/* Events Table */}
+        {events.length > 0 && (
+          <ThemedView style={styles.tableCard}>
             <View style={styles.tableSection}>
               <View
                 style={[
@@ -669,32 +682,36 @@ export default function TimerScreen() {
                 </View>
               )}
             </View>
-          )}
+          </ThemedView>
+        )}
 
-          {tripStarted && (
-            <View style={styles.notesSection}>
-              <ThemedText style={styles.notesLabel}>ملاحظات الرحلة (اختياري)</ThemedText>
-              <TextInput
-                style={[
-                  styles.notesInput,
-                  {
-                    backgroundColor: theme.backgroundSecondary,
-                    borderColor: theme.border,
-                    color: theme.text,
-                  },
-                ]}
-                placeholder="أضف ملاحظات أو تفاصيل إضافية عن الرحلة..."
-                placeholderTextColor={theme.textSecondary}
-                value={tripNotes}
-                onChangeText={setTripNotes}
-                multiline
-                numberOfLines={3}
-                textAlign="right"
-              />
-            </View>
-          )}
+        {/* Trip Notes */}
+        {tripStarted && (
+          <ThemedView style={styles.notesCard}>
+            <ThemedText style={styles.notesLabel}>ملاحظات الرحلة (اختياري)</ThemedText>
+            <TextInput
+              style={[
+                styles.notesInput,
+                {
+                  backgroundColor: theme.backgroundSecondary,
+                  borderColor: theme.border,
+                  color: theme.text,
+                },
+              ]}
+              placeholder="أضف ملاحظات أو تفاصيل إضافية عن الرحلة..."
+              placeholderTextColor={theme.textSecondary}
+              value={tripNotes}
+              onChangeText={setTripNotes}
+              multiline
+              numberOfLines={3}
+              textAlign="right"
+            />
+          </ThemedView>
+        )}
 
-          {summary && (
+        {/* Summary Section */}
+        {summary && (
+          <ThemedView style={styles.summaryCard}>
             <View style={styles.summarySection}>
               <ThemedText style={styles.summaryLabel}>ملخص الرحلة</ThemedText>
               <View
@@ -707,21 +724,22 @@ export default function TimerScreen() {
               </View>
               <Pressable
                 style={({ pressed }) => [
-                  styles.button,
-                  styles.primaryButton,
+                  styles.copySummaryButton,
                   { backgroundColor: theme.accent, opacity: pressed ? 0.7 : 1 },
                 ]}
                 onPress={copySummary}
               >
-                <ThemedText style={styles.buttonText}>نسخ الملخص</ThemedText>
+                <Feather name="copy" size={18} color="#FFFFFF" />
+                <ThemedText style={styles.copySummaryButtonText}>نسخ الملخص</ThemedText>
               </Pressable>
             </View>
-          )}
+          </ThemedView>
+        )}
 
-          <ThemedText style={[styles.footer, { color: theme.textSecondary }]}>
-            الوقت يُحسب بحسب ساعة جهازك. يمكنك نسخ الملخص ولصقه في واتساب أو الملاحظات.
-          </ThemedText>
-        </ThemedView>
+        {/* Footer */}
+        <ThemedText style={[styles.footer, { color: theme.textSecondary }]}>
+          الوقت يُحسب بحسب ساعة جهازك. يمكنك نسخ الملخص ولصقه في واتساب أو الملاحظات.
+        </ThemedText>
       </View>
     </ScreenScrollView>
   );
@@ -733,68 +751,167 @@ const isSmallScreen = screenWidth < 400;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: isSmallScreen ? Spacing.sm : Spacing.lg,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    gap: Spacing.lg,
   },
-  card: {
-    padding: isSmallScreen ? Spacing.lg : Spacing["2xl"],
-    borderRadius: BorderRadius.lg,
+  timerCard: {
+    padding: Spacing["2xl"],
+    borderRadius: BorderRadius.xl,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.08,
-    shadowRadius: 24,
-    elevation: 5,
-    marginVertical: isSmallScreen ? Spacing.sm : Spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.1)',
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+    elevation: 8,
+    alignItems: 'center',
   },
-  buttonGrid: {
-    flexDirection: "column",
-    gap: Spacing.sm,
-    marginBottom: isSmallScreen ? Spacing.md : Spacing["2xl"],
-  },
-  button: {
-    minHeight: isSmallScreen ? 48 : 54,
-    paddingVertical: isSmallScreen ? Spacing.md : Spacing.lg,
-    paddingHorizontal: isSmallScreen ? Spacing.md : Spacing.lg,
-    borderRadius: BorderRadius.md,
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
+  actionCard: {
+    borderRadius: BorderRadius.lg,
+    overflow: 'hidden',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 3,
   },
-  primaryButton: {},
-  secondaryButton: {},
-  destructiveButton: {},
-  buttonText: {
-    fontSize: isSmallScreen ? 14 : 16,
-    fontWeight: "600",
-    letterSpacing: 0.3,
+  quickActionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.md,
   },
-  buttonContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+  startButton: {
+    paddingVertical: Spacing["2xl"],
+    paddingHorizontal: Spacing.xl,
+    borderRadius: BorderRadius.lg,
   },
-  customEventSection: {
-    marginBottom: isSmallScreen ? Spacing.md : Spacing["2xl"],
-    gap: isSmallScreen ? Spacing.xs : Spacing.lg,
+  startButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.lg,
   },
-  input: {
-    height: isSmallScreen ? 36 : Spacing.inputHeight,
-    borderWidth: 1.5,
-    borderRadius: BorderRadius.sm,
-    paddingHorizontal: Spacing.md,
-    fontSize: isSmallScreen ? 14 : 16,
-    writingDirection: "rtl",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
+  startIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  startTextContainer: {
+    flex: 1,
+  },
+  startButtonTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginBottom: Spacing.xs,
+  },
+  startButtonSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.85)',
+  },
+  quickActionCard: {
+    width: (screenWidth - Spacing.lg * 2 - Spacing.md) / 2,
+    aspectRatio: 1,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 2,
   },
+  quickActionIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickActionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  customEventCard: {
+    padding: Spacing.xl,
+    borderRadius: BorderRadius.lg,
+    gap: Spacing.md,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 2,
+  },
+  customEventHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.xs,
+  },
+  customEventTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  customEventInput: {
+    height: 52,
+    borderWidth: 2,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.lg,
+    fontSize: 15,
+    writingDirection: "rtl",
+  },
+  customEventActions: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  customEventButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: BorderRadius.md,
+    minWidth: 56,
+  },
+  customEventButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  eventsCard: {
+    padding: Spacing.xl,
+    borderRadius: BorderRadius.lg,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 2,
+  },
+  eventsCardTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: Spacing.lg,
+    textAlign: 'center',
+  },
+  eventsGrid: {
+    gap: Spacing.sm,
+  },
+  eventButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
+    borderRadius: BorderRadius.md,
+  },
+  eventButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    flex: 1,
+    textAlign: 'right',
+  },
   tableSection: {
-    marginBottom: isSmallScreen ? Spacing.md : Spacing["2xl"],
+    gap: Spacing.sm,
   },
   tableHeader: {
     flexDirection: "row",
@@ -848,81 +965,38 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   summarySection: {
-    marginBottom: Spacing.xl,
-    gap: Spacing.md,
+    gap: Spacing.lg,
   },
   summaryLabel: {
-    fontSize: isSmallScreen ? 13 : 16,
+    fontSize: 18,
     fontWeight: "700",
     textAlign: "right",
-    letterSpacing: 0.3,
-    marginBottom: Spacing.sm,
   },
   summaryBox: {
-    minHeight: isSmallScreen ? 120 : 140,
-    padding: isSmallScreen ? Spacing.md : Spacing.lg,
+    minHeight: 120,
+    padding: Spacing.lg,
     borderRadius: BorderRadius.md,
-    borderWidth: 1.5,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    borderWidth: 2,
   },
   summaryText: {
-    fontSize: isSmallScreen ? 13 : 13,
+    fontSize: 14,
     textAlign: "right",
-    lineHeight: isSmallScreen ? 20 : 22,
-  },
-  timerDisplay: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: isSmallScreen ? Spacing.md : Spacing["2xl"],
-    paddingVertical: isSmallScreen ? Spacing.lg : Spacing["3xl"],
-    paddingHorizontal: isSmallScreen ? Spacing.lg : Spacing["2xl"],
-    borderRadius: BorderRadius.xl,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.15)',
+    lineHeight: 22,
   },
   timerLabel: {
-    fontSize: isSmallScreen ? 11 : 13,
+    fontSize: 14,
     fontWeight: "600",
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.md,
     letterSpacing: 0.5,
+    color: 'rgba(255, 255, 255, 0.9)',
+    textTransform: 'uppercase',
   },
   timerValue: {
-    fontSize: isSmallScreen ? 40 : 64,
-    fontWeight: "800",
+    fontSize: 56,
+    fontWeight: "900",
     letterSpacing: -2,
-  },
-  footer: {
-    fontSize: 12,
-    textAlign: "center",
-    marginTop: Spacing.md,
-  },
-  dropdownMenu: {
-    borderWidth: 1.5,
-    borderRadius: BorderRadius.md,
-    marginBottom: isSmallScreen ? Spacing.md : Spacing["2xl"],
-    overflow: "hidden",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  dropdownItem: {
-    paddingVertical: isSmallScreen ? Spacing.sm : Spacing.md,
-    paddingHorizontal: isSmallScreen ? Spacing.md : Spacing.lg,
-    borderBottomWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  dropdownItemText: {
-    fontSize: isSmallScreen ? 12 : 14,
-    fontWeight: "500",
+    color: '#FFFFFF',
+    marginBottom: Spacing.lg,
   },
   photoActionPanel: {
     borderWidth: 1.5,
@@ -955,67 +1029,86 @@ const styles = StyleSheet.create({
     fontSize: isSmallScreen ? 10 : 12,
     fontWeight: "600",
   },
-  smallButton: {
-    minHeight: isSmallScreen ? 30 : 36,
-    paddingVertical: isSmallScreen ? 4 : Spacing.xs,
-    paddingHorizontal: isSmallScreen ? Spacing.xs : Spacing.md,
-    borderRadius: BorderRadius.sm,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 1,
-  },
-  smallButtonText: {
-    fontSize: isSmallScreen ? 10 : 13,
-    fontWeight: "500",
-  },
-  timerSection: {
-    marginBottom: Spacing["2xl"],
-    gap: isSmallScreen ? Spacing.sm : Spacing.md,
-  },
   locationContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: Spacing.xs,
+    gap: Spacing.sm,
+    width: '100%',
   },
   locationInput: {
-    height: isSmallScreen ? 36 : 40,
-    borderWidth: 1.5,
-    borderRadius: BorderRadius.sm,
-    paddingHorizontal: Spacing.sm,
-    fontSize: isSmallScreen ? 12 : 14,
+    height: 48,
+    borderWidth: 2,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.lg,
+    fontSize: 14,
     writingDirection: "rtl",
+    fontWeight: '500',
   },
   locationIconButton: {
-    width: isSmallScreen ? 36 : 40,
-    height: isSmallScreen ? 36 : 40,
-    borderRadius: BorderRadius.sm,
+    width: 48,
+    height: 48,
+    borderRadius: BorderRadius.md,
     alignItems: "center",
     justifyContent: "center",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 1,
   },
-  notesSection: {
-    marginBottom: isSmallScreen ? Spacing.md : Spacing["2xl"],
+  tableCard: {
+    padding: Spacing.xl,
+    borderRadius: BorderRadius.lg,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 2,
+  },
+  notesCard: {
+    padding: Spacing.xl,
+    borderRadius: BorderRadius.lg,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 2,
+    gap: Spacing.md,
   },
   notesLabel: {
-    fontSize: isSmallScreen ? 12 : 14,
-    fontWeight: "600",
-    marginBottom: Spacing.sm,
-    textAlign: "right",
+    fontSize: 16,
+    fontWeight: "700",
   },
   notesInput: {
-    minHeight: 80,
-    borderWidth: 1.5,
-    borderRadius: BorderRadius.sm,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    fontSize: isSmallScreen ? 13 : 14,
+    minHeight: 100,
+    borderWidth: 2,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    fontSize: 15,
     writingDirection: "rtl",
     textAlignVertical: "top",
+  },
+  summaryCard: {
+    padding: Spacing.xl,
+    borderRadius: BorderRadius.lg,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 2,
+  },
+  copySummaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xl,
+    borderRadius: BorderRadius.md,
+  },
+  copySummaryButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  footer: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
+    lineHeight: 18,
   },
 });

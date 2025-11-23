@@ -311,8 +311,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: Spacing.lg,
-    paddingBottom: Spacing['3xl'],
+    padding: Spacing.xl,
+    paddingBottom: Spacing['4xl'],
   },
   section: {
     padding: Spacing.xl,

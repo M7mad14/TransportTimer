@@ -227,13 +227,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: Spacing.lg,
-    paddingBottom: Spacing['3xl'],
+    padding: Spacing.xl,
+    paddingBottom: Spacing['4xl'],
   },
   cardsRow: {
     flexDirection: 'row',
-    gap: Spacing.md,
-    marginBottom: Spacing.md,
+    gap: Spacing.lg,
+    marginBottom: Spacing.lg,
   },
   statCard: {
     padding: Spacing.xl,

@@ -179,7 +179,7 @@ export default function ExportScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
   },
   card: {
     padding: Spacing.xl,
@@ -221,8 +221,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   exportOptions: {
-    gap: Spacing.md,
-    marginBottom: Spacing.lg,
+    gap: Spacing.lg,
+    marginBottom: Spacing.xl,
   },
   exportButton: {
     flexDirection: 'row',
