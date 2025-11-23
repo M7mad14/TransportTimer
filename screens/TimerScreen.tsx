@@ -1,28 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, TextInput, Pressable, Alert, I18nManager } from "react-native";
+import { View, StyleSheet, TextInput, Pressable, Alert, I18nManager, Image } from "react-native";
 import * as Clipboard from "expo-clipboard";
+import * as ImagePicker from "expo-image-picker";
+import { useNavigation } from "@react-navigation/native";
 
 import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
-
-interface TripEvent {
-  id: number;
-  label: string;
-  time: Date;
-  timeDiff?: number;
-}
+import { TripEvent, saveTrip } from "@/utils/storage";
+import { Feather } from "@expo/vector-icons";
 
 export default function TimerScreen() {
   const { theme } = useTheme();
+  const navigation = useNavigation();
 
   useEffect(() => {
     I18nManager.forceRTL(true);
     I18nManager.allowRTL(true);
   }, []);
   const [tripStarted, setTripStarted] = useState(false);
+  const [tripStartTime, setTripStartTime] = useState<Date | null>(null);
   const [events, setEvents] = useState<TripEvent[]>([]);
   const [customEventText, setCustomEventText] = useState("");
   const [summary, setSummary] = useState("");
@@ -96,18 +95,68 @@ export default function TimerScreen() {
   };
 
   const startTrip = () => {
+    const now = new Date();
+    setTripStartTime(now);
     setEvents([]);
     setSummary("");
     setCustomEventText("");
     setTripStarted(true);
-    addEvent("بداية الرحلة");
+    
+    const firstEvent: TripEvent = {
+      id: 1,
+      label: "بداية الرحلة",
+      time: now,
+      timeDiff: undefined,
+    };
+    setEvents([firstEvent]);
+    setSummary(generateSummary([firstEvent]));
   };
 
-  const resetTrip = () => {
+  const saveAndResetTrip = async () => {
+    if (events.length > 0 && tripStartTime) {
+      try {
+        await saveTrip({
+          startTime: tripStartTime,
+          endTime: events[events.length - 1].time,
+          events,
+          summary,
+        });
+        Alert.alert("", "تم حفظ الرحلة بنجاح ✅");
+      } catch (error) {
+        Alert.alert("", "حدث خطأ أثناء حفظ الرحلة");
+      }
+    }
     setEvents([]);
     setSummary("");
     setCustomEventText("");
     setTripStarted(false);
+    setTripStartTime(null);
+  };
+
+  const resetTrip = () => {
+    if (events.length > 0) {
+      Alert.alert(
+        "حفظ الرحلة؟",
+        "هل تريد حفظ هذه الرحلة قبل المسح؟",
+        [
+          { text: "مسح بدون حفظ", onPress: () => {
+            setEvents([]);
+            setSummary("");
+            setCustomEventText("");
+            setTripStarted(false);
+            setTripStartTime(null);
+          }, style: "destructive" },
+          { text: "حفظ ثم مسح", onPress: saveAndResetTrip },
+          { text: "إلغاء", style: "cancel" },
+        ]
+      );
+    } else {
+      setEvents([]);
+      setSummary("");
+      setCustomEventText("");
+      setTripStarted(false);
+      setTripStartTime(null);
+    }
   };
 
   const handleCustomEvent = () => {
@@ -126,6 +175,42 @@ export default function TimerScreen() {
     }
   };
 
+  const attachPhotoToLastEvent = async () => {
+    if (events.length === 0) {
+      Alert.alert("", "لا توجد أحداث لإرفاق صورة بها");
+      return;
+    }
+
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("", "نحتاج إلى إذن للوصول إلى معرض الصور");
+      return;
+    }
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.7,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const updatedEvents = [...events];
+        const lastEventIndex = updatedEvents.length - 1;
+        updatedEvents[lastEventIndex] = {
+          ...updatedEvents[lastEventIndex],
+          photoUri: result.assets[0].uri,
+        };
+        setEvents(updatedEvents);
+        setSummary(generateSummary(updatedEvents));
+        Alert.alert("", "تم إرفاق الصورة بآخر حدث ✅");
+      }
+    } catch (error) {
+      Alert.alert("", "حدث خطأ أثناء اختيار الصورة");
+    }
+  };
+
   return (
     <ScreenScrollView>
       <View style={styles.container}>
@@ -140,6 +225,25 @@ export default function TimerScreen() {
               onPress={startTrip}
             >
               <ThemedText style={styles.buttonText}>بدء الرحلة</ThemedText>
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                styles.secondaryButton,
+                {
+                  backgroundColor: theme.backgroundTertiary,
+                  opacity: pressed ? 0.7 : 1,
+                },
+              ]}
+              onPress={() => navigation.navigate("History" as never)}
+            >
+              <View style={styles.buttonContent}>
+                <Feather name="clock" size={20} color={theme.text} />
+                <ThemedText style={[styles.buttonText, { color: theme.text, marginRight: Spacing.sm }]}>
+                  الرحلات السابقة
+                </ThemedText>
+              </View>
             </Pressable>
 
             <Pressable
@@ -255,6 +359,26 @@ export default function TimerScreen() {
                 إضافة حدث مخصص
               </ThemedText>
             </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                styles.secondaryButton,
+                {
+                  backgroundColor: theme.backgroundTertiary,
+                  opacity: pressed ? 0.7 : events.length > 0 ? 1 : 0.5,
+                },
+              ]}
+              onPress={attachPhotoToLastEvent}
+              disabled={events.length === 0}
+            >
+              <View style={styles.buttonContent}>
+                <Feather name="camera" size={20} color={theme.text} />
+                <ThemedText style={[styles.buttonText, { color: theme.text, marginRight: Spacing.sm }]}>
+                  إرفاق صورة للحدث الأخير
+                </ThemedText>
+              </View>
+            </Pressable>
           </View>
 
           {events.length > 0 && (
@@ -284,7 +408,12 @@ export default function TimerScreen() {
                   <ThemedText style={[styles.tableCell, styles.colTime]}>
                     {formatTime(event.time)}
                   </ThemedText>
-                  <ThemedText style={[styles.tableCell, styles.colEvent]}>{event.label}</ThemedText>
+                  <View style={[styles.tableCell, styles.colEvent, styles.eventCell]}>
+                    <ThemedText style={styles.eventText}>{event.label}</ThemedText>
+                    {event.photoUri ? (
+                      <Feather name="image" size={16} color={theme.accent} />
+                    ) : null}
+                  </View>
                   <ThemedText style={[styles.tableCell, styles.colNum]}>{event.id}</ThemedText>
                 </View>
               ))}
@@ -359,6 +488,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
   },
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   customEventSection: {
     marginBottom: Spacing["2xl"],
     gap: Spacing.md,
@@ -407,6 +541,16 @@ const styles = StyleSheet.create({
   },
   colDiff: {
     width: "35%",
+  },
+  eventCell: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: Spacing.xs,
+  },
+  eventText: {
+    fontSize: 14,
+    textAlign: "center",
   },
   summarySection: {
     marginBottom: Spacing["2xl"],
