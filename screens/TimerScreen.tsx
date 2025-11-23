@@ -24,6 +24,7 @@ export default function TimerScreen() {
   const [summary, setSummary] = useState("");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [showEventDropdown, setShowEventDropdown] = useState(false);
+  const [selectedEventForPhoto, setSelectedEventForPhoto] = useState<number | null>(null);
 
   useEffect(() => {
     I18nManager.forceRTL(true);
@@ -210,12 +211,7 @@ export default function TimerScreen() {
     }
   };
 
-  const attachPhotoToLastEvent = async () => {
-    if (events.length === 0) {
-      Alert.alert("", "لا توجد أحداث لإرفاق صورة بها");
-      return;
-    }
-
+  const attachPhotoToEvent = async (eventId: number) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert("", "نحتاج إلى إذن للوصول إلى معرض الصور");
@@ -231,19 +227,38 @@ export default function TimerScreen() {
       });
 
       if (!result.canceled && result.assets[0]) {
-        const updatedEvents = [...events];
-        const lastEventIndex = updatedEvents.length - 1;
-        updatedEvents[lastEventIndex] = {
-          ...updatedEvents[lastEventIndex],
-          photoUri: result.assets[0].uri,
-        };
+        const updatedEvents = events.map((event) =>
+          event.id === eventId
+            ? { ...event, photoUri: result.assets[0].uri }
+            : event
+        );
         setEvents(updatedEvents);
         setSummary(generateSummary(updatedEvents));
-        Alert.alert("", "تم إرفاق الصورة بآخر حدث ✅");
+        Alert.alert("", "تم إرفاق الصورة ✅");
+        setSelectedEventForPhoto(null);
       }
     } catch (error) {
       Alert.alert("", "حدث خطأ أثناء اختيار الصورة");
     }
+  };
+
+  const removePhotoFromEvent = (eventId: number) => {
+    const updatedEvents = events.map((event) =>
+      event.id === eventId
+        ? { ...event, photoUri: undefined }
+        : event
+    );
+    setEvents(updatedEvents);
+    setSummary(generateSummary(updatedEvents));
+    setSelectedEventForPhoto(null);
+  };
+
+  const attachPhotoToLastEvent = async () => {
+    if (events.length === 0) {
+      Alert.alert("", "لا توجد أحداث لإرفاق صورة بها");
+      return;
+    }
+    await attachPhotoToEvent(events[events.length - 1].id);
   };
 
   return (
@@ -465,9 +480,17 @@ export default function TimerScreen() {
               </View>
 
               {events.map((event) => (
-                <View
+                <Pressable
                   key={event.id}
-                  style={[styles.tableRow, { borderBottomColor: theme.border }]}
+                  onPress={() => setSelectedEventForPhoto(selectedEventForPhoto === event.id ? null : event.id)}
+                  style={({ pressed }) => [
+                    styles.tableRow,
+                    { 
+                      borderBottomColor: theme.border,
+                      backgroundColor: selectedEventForPhoto === event.id ? theme.backgroundTertiary : "transparent",
+                      opacity: pressed ? 0.7 : 1,
+                    },
+                  ]}
                 >
                   <ThemedText style={[styles.tableCell, styles.colDiff]}>
                     {event.timeDiff !== undefined ? formatTimeDiff(event.timeDiff) : "-"}
@@ -482,8 +505,49 @@ export default function TimerScreen() {
                     ) : null}
                   </View>
                   <ThemedText style={[styles.tableCell, styles.colNum]}>{event.id}</ThemedText>
-                </View>
+                </Pressable>
               ))}
+              
+              {selectedEventForPhoto !== null && (
+                <View style={[styles.photoActionPanel, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
+                  <ThemedText style={styles.photoActionLabel}>خيارات الصورة:</ThemedText>
+                  <View style={styles.photoActionButtons}>
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.photoActionButton,
+                        { backgroundColor: theme.accent, opacity: pressed ? 0.7 : 1 },
+                      ]}
+                      onPress={() => {
+                        playClickSound();
+                        attachPhotoToEvent(selectedEventForPhoto);
+                      }}
+                    >
+                      <Feather name="plus" size={18} color={theme.buttonText} />
+                      <ThemedText style={[styles.photoActionButtonText, { color: theme.buttonText }]}>
+                        إضافة صورة
+                      </ThemedText>
+                    </Pressable>
+
+                    {events.find(e => e.id === selectedEventForPhoto)?.photoUri ? (
+                      <Pressable
+                        style={({ pressed }) => [
+                          styles.photoActionButton,
+                          { backgroundColor: theme.destructive, opacity: pressed ? 0.7 : 1 },
+                        ]}
+                        onPress={() => {
+                          playClickSound();
+                          removePhotoFromEvent(selectedEventForPhoto);
+                        }}
+                      >
+                        <Feather name="trash-2" size={18} color={theme.buttonText} />
+                        <ThemedText style={[styles.photoActionButtonText, { color: theme.buttonText }]}>
+                          حذف الصورة
+                        </ThemedText>
+                      </Pressable>
+                    ) : null}
+                  </View>
+                </View>
+              )}
             </View>
           )}
 
@@ -708,5 +772,36 @@ const styles = StyleSheet.create({
   dropdownItemText: {
     fontSize: 14,
     fontWeight: "500",
+  },
+  photoActionPanel: {
+    borderWidth: 1.5,
+    borderRadius: BorderRadius.md,
+    padding: Spacing.lg,
+    marginTop: Spacing.md,
+    marginBottom: Spacing["2xl"],
+  },
+  photoActionLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: Spacing.md,
+    textAlign: "center",
+  },
+  photoActionButtons: {
+    flexDirection: "row",
+    gap: Spacing.md,
+  },
+  photoActionButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    gap: Spacing.sm,
+  },
+  photoActionButtonText: {
+    fontSize: 12,
+    fontWeight: "600",
   },
 });
