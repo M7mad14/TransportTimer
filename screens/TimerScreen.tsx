@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, StyleSheet, TextInput, Pressable, Alert, I18nManager, Image } from "react-native";
+import { View, StyleSheet, TextInput, Pressable, Alert, I18nManager, Image, Platform } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
+import * as Location from "expo-location";
+import * as Linking from "expo-linking";
 import { useNavigation } from "@react-navigation/native";
 
 import { ScreenScrollView } from "@/components/ScreenScrollView";
@@ -38,6 +40,42 @@ export default function TimerScreen() {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch (error) {
       // Silent fail if haptics not available
+    }
+  };
+
+  const getCurrentLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("", "نحتاج إلى إذن الوصول إلى الموقع");
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync({});
+      const address = await Location.reverseGeocodeAsync({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+      if (address.length > 0) {
+        const locationName = address[0].name || address[0].city || "الموقع الحالي";
+        setStartLocation(locationName);
+        setSummary(generateSummary(events));
+      }
+    } catch (error) {
+      Alert.alert("", "خطأ في الحصول على الموقع الحالي");
+    }
+  };
+
+  const openMapsForLocation = async () => {
+    try {
+      let mapUrl = "";
+      if (Platform.OS === "ios") {
+        mapUrl = "maps://";
+      } else {
+        mapUrl = "geo://0,0?q=";
+      }
+      await Linking.openURL(mapUrl);
+    } catch (error) {
+      Alert.alert("", "لا يمكن فتح تطبيق الخرائط");
     }
   };
 
@@ -279,24 +317,53 @@ export default function TimerScreen() {
                 <ThemedText style={styles.timerValue}>{formatElapsedTime(elapsedSeconds)}</ThemedText>
               </View>
               
-              <TextInput
-                style={[
-                  styles.locationInput,
-                  {
-                    backgroundColor: theme.backgroundSecondary,
-                    borderColor: theme.border,
-                    color: theme.text,
-                  },
-                ]}
-                placeholder="من أين تبدأ؟"
-                placeholderTextColor={theme.textSecondary}
-                value={startLocation}
-                onChangeText={(text) => {
-                  setStartLocation(text);
-                  setSummary(generateSummary(events));
-                }}
-                textAlign="right"
-              />
+              <View style={styles.locationContainer}>
+                <TextInput
+                  style={[
+                    styles.locationInput,
+                    {
+                      backgroundColor: theme.backgroundSecondary,
+                      borderColor: theme.border,
+                      color: theme.text,
+                      flex: 1,
+                    },
+                  ]}
+                  placeholder="من أين تبدأ؟"
+                  placeholderTextColor={theme.textSecondary}
+                  value={startLocation}
+                  onChangeText={(text) => {
+                    setStartLocation(text);
+                    setSummary(generateSummary(events));
+                  }}
+                  textAlign="right"
+                />
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.locationIconButton,
+                    { backgroundColor: theme.accent, opacity: pressed ? 0.7 : 1 },
+                  ]}
+                  onPress={() => {
+                    playClickSound();
+                    getCurrentLocation();
+                  }}
+                  hitSlop={8}
+                >
+                  <Feather name="navigation" size={18} color="#fff" />
+                </Pressable>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.locationIconButton,
+                    { backgroundColor: theme.accent, opacity: pressed ? 0.7 : 1, marginRight: Spacing.xs },
+                  ]}
+                  onPress={() => {
+                    playClickSound();
+                    openMapsForLocation();
+                  }}
+                  hitSlop={8}
+                >
+                  <Feather name="map-pin" size={18} color="#fff" />
+                </Pressable>
+              </View>
             </View>
           )}
           <View style={styles.buttonGrid}>
@@ -850,6 +917,11 @@ const styles = StyleSheet.create({
     marginBottom: Spacing["2xl"],
     gap: Spacing.md,
   },
+  locationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+  },
   locationInput: {
     height: 40,
     borderWidth: 1.5,
@@ -857,5 +929,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     fontSize: 14,
     writingDirection: "rtl",
+  },
+  locationIconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: BorderRadius.sm,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 1,
   },
 });
