@@ -421,8 +421,7 @@ export default function TimerScreen() {
             />
             <Pressable
               style={({ pressed }) => [
-                styles.button,
-                styles.secondaryButton,
+                styles.smallButton,
                 {
                   backgroundColor: theme.backgroundTertiary,
                   opacity: pressed ? 0.7 : tripStarted ? 1 : 0.5,
@@ -434,15 +433,14 @@ export default function TimerScreen() {
               }}
               disabled={!tripStarted}
             >
-              <ThemedText style={[styles.buttonText, { color: theme.text }]}>
+              <ThemedText style={[styles.smallButtonText, { color: theme.text }]}>
                 إضافة حدث مخصص
               </ThemedText>
             </Pressable>
 
             <Pressable
               style={({ pressed }) => [
-                styles.button,
-                styles.secondaryButton,
+                styles.smallButton,
                 {
                   backgroundColor: theme.backgroundTertiary,
                   opacity: pressed ? 0.7 : events.length > 0 ? 1 : 0.5,
@@ -455,9 +453,9 @@ export default function TimerScreen() {
               disabled={events.length === 0}
             >
               <View style={styles.buttonContent}>
-                <Feather name="camera" size={20} color={theme.text} />
-                <ThemedText style={[styles.buttonText, { color: theme.text, marginRight: Spacing.sm }]}>
-                  إرفاق صورة للحدث الأخير
+                <Feather name="camera" size={16} color={theme.text} />
+                <ThemedText style={[styles.smallButtonText, { color: theme.text, marginRight: Spacing.sm }]}>
+                  إرفاق صورة
                 </ThemedText>
               </View>
             </Pressable>
@@ -803,5 +801,21 @@ const styles = StyleSheet.create({
   photoActionButtonText: {
     fontSize: 12,
     fontWeight: "600",
+  },
+  smallButton: {
+    minHeight: 36,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  smallButtonText: {
+    fontSize: 13,
+    fontWeight: "500",
   },
 });
