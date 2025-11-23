@@ -299,6 +299,13 @@ export default function TripDetailScreen() {
             ))}
           </View>
 
+          {trip.startLocation && (
+            <View style={styles.locationSection}>
+              <ThemedText style={styles.locationLabel}>نقطة البداية</ThemedText>
+              <ThemedText style={styles.locationValue}>{trip.startLocation}</ThemedText>
+            </View>
+          )}
+
           <View style={styles.summarySection}>
             <ThemedText style={styles.summaryLabel}>ملخص الرحلة</ThemedText>
             <View
@@ -427,6 +434,22 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.xs,
     paddingHorizontal: Spacing.sm,
     fontSize: 14,
+  },
+  locationSection: {
+    marginBottom: Spacing.lg,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.xs,
+    backgroundColor: "rgba(0, 128, 128, 0.08)",
+  },
+  locationLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    marginBottom: Spacing.xs,
+    opacity: 0.7,
+  },
+  locationValue: {
+    fontSize: 14,
+    fontWeight: "500",
   },
   summarySection: {
     gap: Spacing.md,

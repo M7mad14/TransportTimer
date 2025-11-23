@@ -25,6 +25,7 @@ export default function TimerScreen() {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [showEventDropdown, setShowEventDropdown] = useState(false);
   const [selectedEventForPhoto, setSelectedEventForPhoto] = useState<number | null>(null);
+  const [startLocation, setStartLocation] = useState("");
 
   useEffect(() => {
     I18nManager.forceRTL(true);
@@ -88,6 +89,10 @@ export default function TimerScreen() {
     if (eventList.length === 0) return "";
 
     let summaryText = "ملخص الرحلة:\n\n";
+    
+    if (startLocation) {
+      summaryText += `من: ${startLocation}\n\n`;
+    }
 
     eventList.forEach((event, index) => {
       const timeStr = formatTime(event.time);
@@ -136,6 +141,7 @@ export default function TimerScreen() {
     setEvents([]);
     setSummary("");
     setCustomEventText("");
+    setStartLocation("");
     setTripStarted(true);
     
     const firstEvent: TripEvent = {
@@ -156,6 +162,7 @@ export default function TimerScreen() {
           endTime: events[events.length - 1].time,
           events,
           summary,
+          startLocation: startLocation || undefined,
         });
         Alert.alert("", "تم حفظ الرحلة بنجاح ✅");
       } catch (error) {
@@ -266,9 +273,30 @@ export default function TimerScreen() {
       <View style={styles.container}>
         <ThemedView style={styles.card}>
           {tripStarted && (
-            <View style={styles.timerDisplay}>
-              <ThemedText style={styles.timerLabel}>الوقت المنقضي</ThemedText>
-              <ThemedText style={styles.timerValue}>{formatElapsedTime(elapsedSeconds)}</ThemedText>
+            <View style={styles.timerSection}>
+              <View style={styles.timerDisplay}>
+                <ThemedText style={styles.timerLabel}>الوقت المنقضي</ThemedText>
+                <ThemedText style={styles.timerValue}>{formatElapsedTime(elapsedSeconds)}</ThemedText>
+              </View>
+              
+              <TextInput
+                style={[
+                  styles.locationInput,
+                  {
+                    backgroundColor: theme.backgroundSecondary,
+                    borderColor: theme.border,
+                    color: theme.text,
+                  },
+                ]}
+                placeholder="من أين تبدأ؟"
+                placeholderTextColor={theme.textSecondary}
+                value={startLocation}
+                onChangeText={(text) => {
+                  setStartLocation(text);
+                  setSummary(generateSummary(events));
+                }}
+                textAlign="right"
+              />
             </View>
           )}
           <View style={styles.buttonGrid}>
@@ -817,5 +845,17 @@ const styles = StyleSheet.create({
   smallButtonText: {
     fontSize: 13,
     fontWeight: "500",
+  },
+  timerSection: {
+    marginBottom: Spacing["2xl"],
+    gap: Spacing.md,
+  },
+  locationInput: {
+    height: 40,
+    borderWidth: 1.5,
+    borderRadius: BorderRadius.sm,
+    paddingHorizontal: Spacing.md,
+    fontSize: 14,
+    writingDirection: "rtl",
   },
 });
