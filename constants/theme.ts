@@ -1,38 +1,53 @@
 import { Platform } from "react-native";
 
-const tintColorLight = "#0D9488";
-const tintColorDark = "#14B8A6";
+// Modern gradient-inspired color palette
+const tintColorLight = "#6366F1"; // Modern Indigo
+const tintColorDark = "#818CF8"; // Light Indigo
 
 export const Colors = {
   light: {
-    text: "#0F172A",
-    textSecondary: "#64748B",
+    text: "#1F2937",
+    textSecondary: "#6B7280",
     buttonText: "#FFFFFF",
-    tabIconDefault: "#94A3B8",
+    tabIconDefault: "#9CA3AF",
     tabIconSelected: tintColorLight,
-    link: "#0D9488",
-    accent: "#0D9488",
-    destructive: "#DC2626",
-    border: "#E2E8F0",
-    backgroundRoot: "#F8FAFC",
+    link: "#6366F1",
+    accent: "#6366F1",
+    accentSecondary: "#8B5CF6", // Purple accent
+    success: "#10B981",
+    warning: "#F59E0B",
+    destructive: "#EF4444",
+    border: "#E5E7EB",
+    borderLight: "#F3F4F6",
+    backgroundRoot: "#F9FAFB",
     backgroundDefault: "#FFFFFF",
-    backgroundSecondary: "#F1F5F9",
-    backgroundTertiary: "#E2E8F0",
+    backgroundSecondary: "#F3F4F6",
+    backgroundTertiary: "#E5E7EB",
+    gradient1: "#6366F1",
+    gradient2: "#8B5CF6",
+    cardShadow: "rgba(99, 102, 241, 0.1)",
   },
   dark: {
-    text: "#F1F5F9",
-    textSecondary: "#CBD5E1",
+    text: "#F9FAFB",
+    textSecondary: "#D1D5DB",
     buttonText: "#FFFFFF",
-    tabIconDefault: "#94A3B8",
+    tabIconDefault: "#9CA3AF",
     tabIconSelected: tintColorDark,
-    link: "#14B8A6",
-    accent: "#14B8A6",
-    destructive: "#EF4444",
-    border: "#334155",
-    backgroundRoot: "#0F172A",
-    backgroundDefault: "#1E293B",
-    backgroundSecondary: "#0F172A",
-    backgroundTertiary: "#334155",
+    link: "#818CF8",
+    accent: "#818CF8",
+    accentSecondary: "#A78BFA", // Light purple
+    success: "#34D399",
+    warning: "#FBBF24",
+    destructive: "#F87171",
+    border: "#374151",
+    borderLight: "#4B5563",
+    backgroundRoot: "#111827",
+    backgroundDefault: "#1F2937",
+    backgroundSecondary: "#374151",
+    backgroundTertiary: "#4B5563",
+    gradient1: "#818CF8",
+    gradient2: "#A78BFA",
+    cardShadow: "rgba(129, 140, 248, 0.15)",
   },
 };
 
@@ -51,13 +66,13 @@ export const Spacing = {
 };
 
 export const BorderRadius = {
-  xs: 8,
-  sm: 12,
-  md: 18,
+  xs: 12,
+  sm: 16,
+  md: 20,
   lg: 24,
-  xl: 30,
-  "2xl": 40,
-  "3xl": 50,
+  xl: 28,
+  "2xl": 32,
+  "3xl": 40,
   full: 9999,
 };
 
