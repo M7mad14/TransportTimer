@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, StyleSheet, TextInput, Pressable, Alert, I18nManager, Image, Platform } from "react-native";
+import { View, StyleSheet, TextInput, Pressable, Alert, I18nManager, Image, Platform, Dimensions } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
@@ -677,34 +677,37 @@ export default function TimerScreen() {
   );
 }
 
+const screenWidth = Dimensions.get("window").width;
+const isSmallScreen = screenWidth < 400;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: Spacing.lg,
+    paddingHorizontal: isSmallScreen ? Spacing.md : Spacing.lg,
   },
   card: {
-    padding: Spacing["2xl"],
+    padding: isSmallScreen ? Spacing.lg : Spacing["2xl"],
     borderRadius: 24,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.12,
     shadowRadius: 16,
     elevation: 8,
-    marginVertical: Spacing.lg,
+    marginVertical: Spacing.md,
   },
   buttonGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: Spacing.md,
-    marginBottom: Spacing["3xl"],
+    gap: isSmallScreen ? Spacing.sm : Spacing.md,
+    marginBottom: Spacing["2xl"],
   },
   button: {
-    minHeight: 44,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
+    minHeight: isSmallScreen ? 40 : 44,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
     borderRadius: BorderRadius.sm,
     alignItems: "center",
     justifyContent: "center",
-    flexBasis: "48%",
+    flexBasis: isSmallScreen ? "100%" : "48%",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
@@ -714,7 +717,7 @@ const styles = StyleSheet.create({
   secondaryButton: {},
   destructiveButton: {},
   buttonText: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontWeight: "500",
   },
   buttonContent: {
@@ -723,8 +726,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   customEventSection: {
-    marginBottom: Spacing["3xl"],
-    gap: Spacing.lg,
+    marginBottom: Spacing["2xl"],
+    gap: isSmallScreen ? Spacing.sm : Spacing.lg,
   },
   input: {
     height: Spacing.inputHeight,
@@ -739,12 +742,12 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   tableSection: {
-    marginBottom: Spacing["3xl"],
+    marginBottom: Spacing["2xl"],
   },
   tableHeader: {
     flexDirection: "row",
-    paddingVertical: Spacing.lg,
-    paddingHorizontal: Spacing.md,
+    paddingVertical: isSmallScreen ? Spacing.sm : Spacing.lg,
+    paddingHorizontal: isSmallScreen ? Spacing.sm : Spacing.md,
     borderRadius: BorderRadius.md,
     marginBottom: Spacing.md,
     shadowOffset: { width: 0, height: 2 },
@@ -753,20 +756,20 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   tableHeaderText: {
-    fontSize: 13,
+    fontSize: isSmallScreen ? 11 : 13,
     fontWeight: "700",
     textAlign: "center",
     letterSpacing: 0.3,
   },
   tableRow: {
     flexDirection: "row",
-    paddingVertical: Spacing.lg,
-    paddingHorizontal: Spacing.md,
+    paddingVertical: isSmallScreen ? Spacing.sm : Spacing.lg,
+    paddingHorizontal: isSmallScreen ? Spacing.sm : Spacing.md,
     borderBottomWidth: 1.5,
     borderRadius: BorderRadius.xs,
   },
   tableCell: {
-    fontSize: 13,
+    fontSize: isSmallScreen ? 11 : 13,
     textAlign: "center",
     fontWeight: "500",
   },
@@ -793,17 +796,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   summarySection: {
-    marginBottom: Spacing["3xl"],
+    marginBottom: Spacing["2xl"],
     gap: Spacing.lg,
   },
   summaryLabel: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: "700",
     textAlign: "right",
     letterSpacing: 0.3,
   },
   summaryBox: {
-    minHeight: 140,
+    minHeight: isSmallScreen ? 100 : 140,
     padding: Spacing.lg,
     borderRadius: BorderRadius.md,
     borderWidth: 1.5,
@@ -813,16 +816,16 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   summaryText: {
-    fontSize: 13,
+    fontSize: isSmallScreen ? 12 : 13,
     textAlign: "right",
-    lineHeight: 22,
+    lineHeight: isSmallScreen ? 18 : 22,
   },
   timerDisplay: {
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: Spacing["3xl"],
-    paddingVertical: Spacing["2xl"],
-    paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing["2xl"],
+    paddingVertical: isSmallScreen ? Spacing.lg : Spacing["2xl"],
+    paddingHorizontal: isSmallScreen ? Spacing.md : Spacing.lg,
     borderRadius: BorderRadius.lg,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.08,
@@ -836,7 +839,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   timerValue: {
-    fontSize: 56,
+    fontSize: isSmallScreen ? 40 : 56,
     fontWeight: "700",
     letterSpacing: -1,
   },
@@ -880,8 +883,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   photoActionButtons: {
-    flexDirection: "row",
-    gap: Spacing.md,
+    flexDirection: isSmallScreen ? "column" : "row",
+    gap: Spacing.sm,
   },
   photoActionButton: {
     flex: 1,
@@ -898,9 +901,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   smallButton: {
-    minHeight: 36,
+    minHeight: isSmallScreen ? 32 : 36,
     paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: isSmallScreen ? Spacing.sm : Spacing.md,
     borderRadius: BorderRadius.sm,
     alignItems: "center",
     justifyContent: "center",
@@ -910,29 +913,29 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   smallButtonText: {
-    fontSize: 13,
+    fontSize: isSmallScreen ? 11 : 13,
     fontWeight: "500",
   },
   timerSection: {
     marginBottom: Spacing["2xl"],
-    gap: Spacing.md,
+    gap: isSmallScreen ? Spacing.sm : Spacing.md,
   },
   locationContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: Spacing.sm,
+    gap: Spacing.xs,
   },
   locationInput: {
-    height: 40,
+    height: isSmallScreen ? 36 : 40,
     borderWidth: 1.5,
     borderRadius: BorderRadius.sm,
-    paddingHorizontal: Spacing.md,
-    fontSize: 14,
+    paddingHorizontal: Spacing.sm,
+    fontSize: isSmallScreen ? 12 : 14,
     writingDirection: "rtl",
   },
   locationIconButton: {
-    width: 40,
-    height: 40,
+    width: isSmallScreen ? 36 : 40,
+    height: isSmallScreen ? 36 : 40,
     borderRadius: BorderRadius.sm,
     alignItems: "center",
     justifyContent: "center",
