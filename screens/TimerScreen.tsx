@@ -683,7 +683,7 @@ const isSmallScreen = screenWidth < 400;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: isSmallScreen ? Spacing.md : Spacing.lg,
+    paddingHorizontal: isSmallScreen ? Spacing.sm : Spacing.lg,
   },
   card: {
     padding: isSmallScreen ? Spacing.md : Spacing["2xl"],
@@ -796,18 +796,19 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   summarySection: {
-    marginBottom: Spacing["2xl"],
-    gap: Spacing.lg,
+    marginBottom: Spacing.xl,
+    gap: Spacing.md,
   },
   summaryLabel: {
-    fontSize: isSmallScreen ? 14 : 16,
+    fontSize: isSmallScreen ? 13 : 16,
     fontWeight: "700",
     textAlign: "right",
     letterSpacing: 0.3,
+    marginBottom: Spacing.sm,
   },
   summaryBox: {
-    minHeight: isSmallScreen ? 100 : 140,
-    padding: Spacing.lg,
+    minHeight: isSmallScreen ? 120 : 140,
+    padding: isSmallScreen ? Spacing.md : Spacing.lg,
     borderRadius: BorderRadius.md,
     borderWidth: 1.5,
     shadowOffset: { width: 0, height: 4 },
@@ -816,9 +817,9 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   summaryText: {
-    fontSize: isSmallScreen ? 12 : 13,
+    fontSize: isSmallScreen ? 13 : 13,
     textAlign: "right",
-    lineHeight: isSmallScreen ? 18 : 22,
+    lineHeight: isSmallScreen ? 20 : 22,
   },
   timerDisplay: {
     alignItems: "center",
@@ -851,7 +852,7 @@ const styles = StyleSheet.create({
   dropdownMenu: {
     borderWidth: 1.5,
     borderRadius: BorderRadius.md,
-    marginBottom: Spacing["2xl"],
+    marginBottom: isSmallScreen ? Spacing.md : Spacing["2xl"],
     overflow: "hidden",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -859,27 +860,27 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   dropdownItem: {
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
+    paddingVertical: isSmallScreen ? Spacing.sm : Spacing.md,
+    paddingHorizontal: isSmallScreen ? Spacing.md : Spacing.lg,
     borderBottomWidth: 1,
     alignItems: "center",
     justifyContent: "center",
   },
   dropdownItemText: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontWeight: "500",
   },
   photoActionPanel: {
     borderWidth: 1.5,
     borderRadius: BorderRadius.md,
-    padding: Spacing.lg,
-    marginTop: Spacing.md,
-    marginBottom: Spacing["2xl"],
+    padding: isSmallScreen ? Spacing.md : Spacing.lg,
+    marginTop: Spacing.sm,
+    marginBottom: isSmallScreen ? Spacing.md : Spacing["2xl"],
   },
   photoActionLabel: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontWeight: "600",
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
     textAlign: "center",
   },
   photoActionButtons: {
@@ -891,13 +892,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
+    paddingVertical: isSmallScreen ? 6 : Spacing.sm,
+    paddingHorizontal: isSmallScreen ? Spacing.xs : Spacing.md,
     borderRadius: BorderRadius.sm,
-    gap: Spacing.sm,
+    gap: Spacing.xs,
   },
   photoActionButtonText: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 10 : 12,
     fontWeight: "600",
   },
   smallButton: {
