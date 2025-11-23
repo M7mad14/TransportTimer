@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, StyleSheet, TextInput, Pressable, Alert, I18nManager, Image } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import * as ImagePicker from "expo-image-picker";
+import * as Haptics from "expo-haptics";
 import { useNavigation } from "@react-navigation/native";
 
 import { ScreenScrollView } from "@/components/ScreenScrollView";
@@ -27,6 +28,15 @@ export default function TimerScreen() {
     I18nManager.forceRTL(true);
     I18nManager.allowRTL(true);
   }, []);
+
+  const playClickSound = async () => {
+    try {
+      // Play haptic feedback on click
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch (error) {
+      // Silent fail if haptics not available
+    }
+  };
 
   useEffect(() => {
     if (!tripStarted || !tripStartTime) {
@@ -252,7 +262,10 @@ export default function TimerScreen() {
                 styles.primaryButton,
                 { backgroundColor: theme.accent, opacity: pressed ? 0.7 : 1 },
               ]}
-              onPress={startTrip}
+              onPress={() => {
+                playClickSound();
+                startTrip();
+              }}
             >
               <ThemedText style={styles.buttonText}>بدء الرحلة</ThemedText>
             </Pressable>
@@ -266,7 +279,10 @@ export default function TimerScreen() {
                   opacity: pressed ? 0.7 : 1,
                 },
               ]}
-              onPress={() => navigation.navigate("History" as never)}
+              onPress={() => {
+                playClickSound();
+                navigation.navigate("History" as never);
+              }}
             >
               <View style={styles.buttonContent}>
                 <Feather name="clock" size={20} color={theme.text} />
@@ -285,7 +301,10 @@ export default function TimerScreen() {
                   opacity: pressed ? 0.7 : tripStarted ? 1 : 0.5,
                 },
               ]}
-              onPress={() => addEvent("خروج من المنزل")}
+              onPress={() => {
+                playClickSound();
+                addEvent("خروج من المنزل");
+              }}
               disabled={!tripStarted}
             >
               <ThemedText style={[styles.buttonText, { color: theme.text }]}>
@@ -302,7 +321,10 @@ export default function TimerScreen() {
                   opacity: pressed ? 0.7 : tripStarted ? 1 : 0.5,
                 },
               ]}
-              onPress={() => addEvent("ركوب السيارة")}
+              onPress={() => {
+                playClickSound();
+                addEvent("ركوب السيارة");
+              }}
               disabled={!tripStarted}
             >
               <ThemedText style={[styles.buttonText, { color: theme.text }]}>
@@ -319,7 +341,10 @@ export default function TimerScreen() {
                   opacity: pressed ? 0.7 : tripStarted ? 1 : 0.5,
                 },
               ]}
-              onPress={() => addEvent("ركوب المترو")}
+              onPress={() => {
+                playClickSound();
+                addEvent("ركوب المترو");
+              }}
               disabled={!tripStarted}
             >
               <ThemedText style={[styles.buttonText, { color: theme.text }]}>
@@ -336,7 +361,10 @@ export default function TimerScreen() {
                   opacity: pressed ? 0.7 : tripStarted ? 1 : 0.5,
                 },
               ]}
-              onPress={() => addEvent("الوصول للوجهة")}
+              onPress={() => {
+                playClickSound();
+                addEvent("الوصول للوجهة");
+              }}
               disabled={!tripStarted}
             >
               <ThemedText style={[styles.buttonText, { color: theme.text }]}>
@@ -350,7 +378,10 @@ export default function TimerScreen() {
                 styles.destructiveButton,
                 { backgroundColor: theme.destructive, opacity: pressed ? 0.7 : 1 },
               ]}
-              onPress={resetTrip}
+              onPress={() => {
+                playClickSound();
+                resetTrip();
+              }}
             >
               <ThemedText style={styles.buttonText}>إعادة تعيين</ThemedText>
             </Pressable>
@@ -382,7 +413,10 @@ export default function TimerScreen() {
                   opacity: pressed ? 0.7 : tripStarted ? 1 : 0.5,
                 },
               ]}
-              onPress={handleCustomEvent}
+              onPress={() => {
+                playClickSound();
+                handleCustomEvent();
+              }}
               disabled={!tripStarted}
             >
               <ThemedText style={[styles.buttonText, { color: theme.text }]}>
@@ -399,7 +433,10 @@ export default function TimerScreen() {
                   opacity: pressed ? 0.7 : events.length > 0 ? 1 : 0.5,
                 },
               ]}
-              onPress={attachPhotoToLastEvent}
+              onPress={() => {
+                playClickSound();
+                attachPhotoToLastEvent();
+              }}
               disabled={events.length === 0}
             >
               <View style={styles.buttonContent}>
