@@ -1,0 +1,90 @@
+I want you to build a simple front-end web app called **Transportation Timer**.
+
+**Goal**
+The app helps me track a trip with multiple stops/transport modes and then copy a summary of the whole trip.  
+The interface must be **in Arabic** and **RTL (right-to-left)**. Text labels, buttons, and summary should all be in Arabic.
+
+**Tech**
+- Pure front-end: HTML + CSS + JavaScript only (no backend).
+- Make it work in a single Replit “HTML/CSS/JS” project.
+- Keep the design simple, clean, and mobile-friendly.
+
+**Layout**
+Create a centered container with:
+1. Title: "مؤقّت الرحلات (Transportation Timer)".
+2. A row of main control buttons:
+   - "بدء الرحلة"
+   - "خروج من المنزل"
+   - "ركوب السيارة"
+   - "ركوب المترو"
+   - "الوصول للوجهة"
+   - "إعادة تعيين" (reset)
+
+3. A section for a custom event:
+   - Text input with placeholder: "اكتب وصف الحدث (مثلاً: توقف عند محطة البنزين)"
+   - Button: "إضافة حدث مخصص"
+
+4. A table to show the events with columns:
+   - "#"
+   - "الحدث"
+   - "الوقت"
+   - "الفرق عن الحدث السابق"
+
+5. A summary area:
+   - Textarea (read-only) where a text summary of the trip appears in Arabic.
+   - Button: "نسخ الملخص" that copies the summary to the clipboard.
+
+6. A small footer note in Arabic, e.g.:
+   - "الوقت يُحسب بحسب ساعة جهازك. يمكنك نسخ الملخص ولصقه في واتساب أو الملاحظات."
+
+**Behavior**
+- When I click "بدء الرحلة":
+  - Clear any previous data.
+  - Start a new trip.
+  - Record the first event automatically with label: "بداية الرحلة" and current time.
+  - Enable all other event buttons and the custom event button.
+
+- When I click any event button (e.g. "خروج من المنزل", "ركوب السيارة", "ركوب المترو", "الوصول للوجهة") or add a custom event:
+  - Add a new row to the table with:
+    - A running index (1, 2, 3, ...)
+    - The event label (in Arabic)
+    - The current time (HH:MM:SS)
+    - The time difference from the previous event (in minutes and seconds).
+- Time difference formatting example in Arabic:
+  - Only seconds: "30 ث"
+  - Only minutes: "5 د"
+  - Both: "3 د و 20 ث"
+  - For the first event, just show "-" or empty.
+
+- The custom event:
+  - Uses whatever text I type in the input as the event label.
+  - If the input is empty, do nothing.
+
+- "إعادة تعيين":
+  - Clears the table, the summary, and all stored events.
+  - Disables event buttons until I press "بدء الرحلة" again.
+
+- Summary generation:
+  - Every time an event is added, regenerate a full Arabic summary in the textarea.
+  - Format example:
+    - "ملخص الرحلة:"
+    - Blank line
+    - "1- بداية الرحلة عند 14:05:10"
+    - "2- خروج من المنزل عند 14:10:00 (بعد 4 د و 50 ث من الحدث السابق)"
+    - "3- ركوب السيارة عند 14:20:30 (بعد 10 د و 30 ث من الحدث السابق)"
+    - ...
+    - Blank line
+    - "إجمالي مدة الرحلة تقريباً: 25 د و 20 ث"
+
+- "نسخ الملخص":
+  - Uses `navigator.clipboard.writeText` to copy the summary.
+  - Show an alert in Arabic when successful: "تم نسخ الملخص إلى الحافظة ✅"
+  - If clipboard fails, show: "لم يتم النسخ تلقائياً، انسخ النص يدوياً."
+
+**Style**
+- Use a light background for the page and a white card for the app.
+- Rounded corners and a soft shadow for the card.
+- Buttons with simple modern styling.
+- Make sure everything is `dir="rtl"` and aligned to the right for Arabic.
+
+Please write clean, well-structured code with comments explaining the main parts.
