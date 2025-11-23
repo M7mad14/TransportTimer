@@ -15,6 +15,8 @@ export interface SavedTrip {
   events: TripEvent[];
   summary: string;
   startLocation?: string;
+  notes?: string;
+  tags?: string[];
 }
 
 const TRIPS_KEY = '@transportation_timer_trips';

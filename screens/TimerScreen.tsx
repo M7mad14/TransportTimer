@@ -28,6 +28,7 @@ export default function TimerScreen() {
   const [showEventDropdown, setShowEventDropdown] = useState(false);
   const [selectedEventForPhoto, setSelectedEventForPhoto] = useState<number | null>(null);
   const [startLocation, setStartLocation] = useState("");
+  const [tripNotes, setTripNotes] = useState("");
 
   useEffect(() => {
     I18nManager.forceRTL(true);
@@ -180,6 +181,7 @@ export default function TimerScreen() {
     setSummary("");
     setCustomEventText("");
     setStartLocation("");
+    setTripNotes("");
     setTripStarted(true);
     
     const firstEvent: TripEvent = {
@@ -201,6 +203,7 @@ export default function TimerScreen() {
           events,
           summary,
           startLocation: startLocation || undefined,
+          notes: tripNotes || undefined,
         });
         Alert.alert("", "تم حفظ الرحلة بنجاح ✅");
       } catch (error) {
@@ -212,6 +215,7 @@ export default function TimerScreen() {
     setCustomEventText("");
     setTripStarted(false);
     setTripStartTime(null);
+    setTripNotes("");
   };
 
   const resetTrip = () => {
@@ -237,6 +241,7 @@ export default function TimerScreen() {
       setCustomEventText("");
       setTripStarted(false);
       setTripStartTime(null);
+      setTripNotes("");
     }
   };
 
@@ -399,6 +404,28 @@ export default function TimerScreen() {
                 <Feather name="clock" size={20} color={theme.text} />
                 <ThemedText style={[styles.buttonText, { color: theme.text, marginRight: Spacing.sm }]}>
                   الرحلات السابقة
+                </ThemedText>
+              </View>
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                styles.secondaryButton,
+                {
+                  backgroundColor: theme.backgroundTertiary,
+                  opacity: pressed ? 0.7 : 1,
+                },
+              ]}
+              onPress={() => {
+                playClickSound();
+                navigation.navigate("Settings" as never);
+              }}
+            >
+              <View style={styles.buttonContent}>
+                <Feather name="settings" size={20} color={theme.text} />
+                <ThemedText style={[styles.buttonText, { color: theme.text, marginRight: Spacing.sm }]}>
+                  الإعدادات
                 </ThemedText>
               </View>
             </Pressable>
@@ -641,6 +668,29 @@ export default function TimerScreen() {
                   </View>
                 </View>
               )}
+            </View>
+          )}
+
+          {tripStarted && (
+            <View style={styles.notesSection}>
+              <ThemedText style={styles.notesLabel}>ملاحظات الرحلة (اختياري)</ThemedText>
+              <TextInput
+                style={[
+                  styles.notesInput,
+                  {
+                    backgroundColor: theme.backgroundSecondary,
+                    borderColor: theme.border,
+                    color: theme.text,
+                  },
+                ]}
+                placeholder="أضف ملاحظات أو تفاصيل إضافية عن الرحلة..."
+                placeholderTextColor={theme.textSecondary}
+                value={tripNotes}
+                onChangeText={setTripNotes}
+                multiline
+                numberOfLines={3}
+                textAlign="right"
+              />
             </View>
           )}
 
@@ -943,5 +993,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 4,
     elevation: 1,
+  },
+  notesSection: {
+    marginBottom: isSmallScreen ? Spacing.md : Spacing["2xl"],
+  },
+  notesLabel: {
+    fontSize: isSmallScreen ? 12 : 14,
+    fontWeight: "600",
+    marginBottom: Spacing.sm,
+    textAlign: "right",
+  },
+  notesInput: {
+    minHeight: 80,
+    borderWidth: 1.5,
+    borderRadius: BorderRadius.sm,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    fontSize: isSmallScreen ? 13 : 14,
+    writingDirection: "rtl",
+    textAlignVertical: "top",
   },
 });

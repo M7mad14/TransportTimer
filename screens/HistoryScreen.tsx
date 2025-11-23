@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { View, StyleSheet, Pressable, FlatList, Alert } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { View, StyleSheet, Pressable, FlatList, Alert, TextInput } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 
@@ -9,12 +9,19 @@ import { ThemedView } from "@/components/ThemedView";
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { getAllTrips, deleteTrip, SavedTrip } from "@/utils/storage";
+import { useHaptics } from "@/hooks/useHaptics";
+
+type SortOption = 'newest' | 'oldest' | 'longest' | 'shortest';
 
 export default function HistoryScreen() {
   const { theme } = useTheme();
   const navigation = useNavigation();
+  const { playLight } = useHaptics();
   const [trips, setTrips] = useState<SavedTrip[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [showSortOptions, setShowSortOptions] = useState(false);
 
   const loadTrips = async () => {
     setLoading(true);
@@ -77,6 +84,56 @@ export default function HistoryScreen() {
       return `${mins} د`;
     } else {
       return `${mins} د و ${secs} ث`;
+    }
+  };
+
+  const filteredAndSortedTrips = useMemo(() => {
+    let result = [...trips];
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(trip => {
+        const hasMatchingEvent = trip.events.some(e => e.label.toLowerCase().includes(query));
+        const hasMatchingLocation = trip.startLocation?.toLowerCase().includes(query);
+        const hasMatchingSummary = trip.summary.toLowerCase().includes(query);
+        return hasMatchingEvent || hasMatchingLocation || hasMatchingSummary;
+      });
+    }
+
+    // Sort
+    switch (sortBy) {
+      case 'newest':
+        result.sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
+        break;
+      case 'oldest':
+        result.sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
+        break;
+      case 'longest':
+        result.sort((a, b) => {
+          const durationA = b.endTime.getTime() - b.startTime.getTime();
+          const durationB = a.endTime.getTime() - a.startTime.getTime();
+          return durationA - durationB;
+        });
+        break;
+      case 'shortest':
+        result.sort((a, b) => {
+          const durationA = a.endTime.getTime() - a.startTime.getTime();
+          const durationB = b.endTime.getTime() - b.startTime.getTime();
+          return durationA - durationB;
+        });
+        break;
+    }
+
+    return result;
+  }, [trips, searchQuery, sortBy]);
+
+  const getSortLabel = (option: SortOption): string => {
+    switch (option) {
+      case 'newest': return 'الأحدث أولاً';
+      case 'oldest': return 'الأقدم أولاً';
+      case 'longest': return 'الأطول مدة';
+      case 'shortest': return 'الأقصر مدة';
     }
   };
 
@@ -152,13 +209,139 @@ export default function HistoryScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
+      {/* Header Actions */}
+      <View style={[styles.header, { backgroundColor: theme.backgroundDefault }]}>
+        <View style={styles.headerActions}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.headerButton,
+              { backgroundColor: theme.backgroundSecondary, opacity: pressed ? 0.7 : 1 },
+            ]}
+            onPress={() => {
+              playLight();
+              navigation.navigate('Statistics' as never);
+            }}
+          >
+            <Feather name="bar-chart-2" size={20} color={theme.text} />
+            <ThemedText style={styles.headerButtonText}>إحصائيات</ThemedText>
+          </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.headerButton,
+              { backgroundColor: theme.backgroundSecondary, opacity: pressed ? 0.7 : 1 },
+            ]}
+            onPress={() => {
+              playLight();
+              navigation.navigate('Export' as never);
+            }}
+          >
+            <Feather name="download" size={20} color={theme.text} />
+            <ThemedText style={styles.headerButtonText}>تصدير</ThemedText>
+          </Pressable>
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <Feather name="search" size={20} color={theme.textSecondary} style={styles.searchIcon} />
+          <TextInput
+            style={[
+              styles.searchInput,
+              {
+                backgroundColor: theme.backgroundSecondary,
+                color: theme.text,
+              },
+            ]}
+            placeholder="ابحث في الرحلات..."
+            placeholderTextColor={theme.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            textAlign="right"
+          />
+          {searchQuery.length > 0 && (
+            <Pressable
+              onPress={() => setSearchQuery('')}
+              hitSlop={8}
+              style={styles.clearButton}
+            >
+              <Feather name="x" size={20} color={theme.textSecondary} />
+            </Pressable>
+          )}
+        </View>
+
+        {/* Sort Options */}
+        <Pressable
+          style={({ pressed }) => [
+            styles.sortButton,
+            {
+              backgroundColor: theme.backgroundSecondary,
+              opacity: pressed ? 0.7 : 1,
+            },
+          ]}
+          onPress={() => {
+            playLight();
+            setShowSortOptions(!showSortOptions);
+          }}
+        >
+          <Feather name="filter" size={18} color={theme.text} />
+          <ThemedText style={styles.sortButtonText}>{getSortLabel(sortBy)}</ThemedText>
+          <Feather name={showSortOptions ? 'chevron-up' : 'chevron-down'} size={18} color={theme.text} />
+        </Pressable>
+
+        {showSortOptions && (
+          <View style={[styles.sortDropdown, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
+            {(['newest', 'oldest', 'longest', 'shortest'] as SortOption[]).map(option => (
+              <Pressable
+                key={option}
+                style={({ pressed }) => [
+                  styles.sortOption,
+                  {
+                    backgroundColor: sortBy === option ? theme.accent + '20' : 'transparent',
+                    opacity: pressed ? 0.7 : 1,
+                  },
+                ]}
+                onPress={() => {
+                  playLight();
+                  setSortBy(option);
+                  setShowSortOptions(false);
+                }}
+              >
+                <ThemedText style={[styles.sortOptionText, sortBy === option && { color: theme.accent }]}>
+                  {getSortLabel(option)}
+                </ThemedText>
+                {sortBy === option && <Feather name="check" size={18} color={theme.accent} />}
+              </Pressable>
+            ))}
+          </View>
+        )}
+      </View>
+
       <FlatList
-        data={trips}
+        data={filteredAndSortedTrips}
         renderItem={renderTripItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Feather name="search" size={48} color={theme.textSecondary} />
+            <ThemedText style={[styles.emptyText, { color: theme.textSecondary }]}>
+              لم يتم العثور على رحلات
+            </ThemedText>
+            {searchQuery.length > 0 && (
+              <Pressable
+                style={({ pressed }) => [
+                  styles.clearSearchButton,
+                  { backgroundColor: theme.accent, opacity: pressed ? 0.7 : 1 },
+                ]}
+                onPress={() => setSearchQuery('')}
+              >
+                <ThemedText style={styles.clearSearchButtonText}>مسح البحث</ThemedText>
+              </Pressable>
+            )}
+          </View>
+        }
       />
     </View>
   );
@@ -167,7 +350,88 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  header: {
     paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.md,
+    gap: Spacing.md,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  headerButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.sm,
+  },
+  headerButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  searchIcon: {
+    position: 'absolute',
+    right: Spacing.md,
+    zIndex: 1,
+  },
+  searchInput: {
+    flex: 1,
+    height: 44,
+    borderRadius: BorderRadius.sm,
+    paddingHorizontal: Spacing.md,
+    paddingRight: 40,
+    paddingLeft: 40,
+    fontSize: 14,
+  },
+  clearButton: {
+    position: 'absolute',
+    left: Spacing.md,
+    zIndex: 1,
+  },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.sm,
+  },
+  sortButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  sortDropdown: {
+    borderRadius: BorderRadius.sm,
+    borderWidth: 1,
+    overflow: 'hidden',
+    marginTop: -Spacing.xs,
+  },
+  sortOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+  },
+  sortOptionText: {
+    fontSize: 14,
+    fontWeight: '500',
   },
   card: {
     padding: Spacing.lg,
@@ -178,6 +442,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   listContent: {
+    paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.lg,
     gap: Spacing.md,
   },
@@ -238,5 +503,16 @@ const styles = StyleSheet.create({
   emptyHint: {
     fontSize: 14,
     textAlign: "center",
+  },
+  clearSearchButton: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: BorderRadius.sm,
+    marginTop: Spacing.md,
+  },
+  clearSearchButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#fff',
   },
 });

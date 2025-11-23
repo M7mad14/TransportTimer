@@ -10,6 +10,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import * as Haptics from "expo-haptics";
+import * as LocalAuthentication from "expo-local-authentication";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -17,6 +18,8 @@ import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const BIOMETRIC_ENABLED_KEY = '@biometric_enabled';
 
 interface AuthScreenProps {
   onAuthenticated: () => void;
@@ -28,12 +31,49 @@ export default function AuthScreen({ onAuthenticated }: AuthScreenProps) {
   const [confirmPin, setConfirmPin] = useState("");
   const [isSettingPin, setIsSettingPin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
 
   useEffect(() => {
     I18nManager.forceRTL(true);
     I18nManager.allowRTL(true);
     checkExistingPin();
+    checkBiometric();
   }, []);
+
+  const checkBiometric = async () => {
+    try {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      const enrolled = await LocalAuthentication.isEnrolledAsync();
+      const biometricEnabled = await AsyncStorage.getItem(BIOMETRIC_ENABLED_KEY);
+      
+      if (compatible && enrolled && biometricEnabled === 'true') {
+        setBiometricAvailable(true);
+        // Auto-trigger biometric authentication
+        setTimeout(() => {
+          handleBiometricAuth();
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error checking biometric:', error);
+    }
+  };
+
+  const handleBiometricAuth = async () => {
+    try {
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'تسجيل الدخول',
+        fallbackLabel: 'استخدام الرمز',
+        cancelLabel: 'إلغاء',
+      });
+
+      if (result.success) {
+        setPin("");
+        onAuthenticated();
+      }
+    } catch (error) {
+      console.error('Biometric auth error:', error);
+    }
+  };
 
   const checkExistingPin = async () => {
     try {
@@ -191,6 +231,27 @@ export default function AuthScreen({ onAuthenticated }: AuthScreenProps) {
                 {isSettingPin ? "تعيين الرمز" : "دخول"}
               </ThemedText>
             </Pressable>
+
+            {!isSettingPin && biometricAvailable && (
+              <Pressable
+                style={({ pressed }) => [
+                  styles.biometricButton,
+                  {
+                    backgroundColor: theme.backgroundSecondary,
+                    opacity: pressed ? 0.7 : 1,
+                  },
+                ]}
+                onPress={() => {
+                  playClickSound();
+                  handleBiometricAuth();
+                }}
+              >
+                <Feather name="smartphone" size={20} color={theme.accent} />
+                <ThemedText style={[styles.biometricButtonText, { color: theme.accent }]}>
+                  استخدام البصمة / الوجه
+                </ThemedText>
+              </Pressable>
+            )}
           </View>
 
           <ThemedText style={styles.hint}>
@@ -278,5 +339,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
     opacity: 0.6,
+  },
+  biometricButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.md,
+  },
+  biometricButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

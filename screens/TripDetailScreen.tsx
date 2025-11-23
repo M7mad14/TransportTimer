@@ -306,6 +306,13 @@ export default function TripDetailScreen() {
             </View>
           )}
 
+          {trip.notes && (
+            <View style={styles.notesSection}>
+              <ThemedText style={styles.notesLabel}>ملاحظات الرحلة</ThemedText>
+              <ThemedText style={styles.notesValue}>{trip.notes}</ThemedText>
+            </View>
+          )}
+
           <View style={styles.summarySection}>
             <ThemedText style={styles.summaryLabel}>ملخص الرحلة</ThemedText>
             <View
@@ -450,6 +457,23 @@ const styles = StyleSheet.create({
   locationValue: {
     fontSize: 14,
     fontWeight: "500",
+  },
+  notesSection: {
+    marginBottom: Spacing.lg,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.xs,
+    backgroundColor: "rgba(139, 92, 246, 0.08)",
+  },
+  notesLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    marginBottom: Spacing.xs,
+    opacity: 0.7,
+  },
+  notesValue: {
+    fontSize: 14,
+    fontWeight: "500",
+    lineHeight: 20,
   },
   summarySection: {
     gap: Spacing.md,
